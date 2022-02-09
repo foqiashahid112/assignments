@@ -20,16 +20,15 @@ int main() {
   for(int i = 0; i < random; i++){
     fgets(buffer, 33, infile);
   }
-  printf("word is %s", buffer);
+  //printf("word is %s", buffer);
   
   printf("Welcome to Word Guess!\n");
   printf("\n\n");
-  int n = strlen(buffer);
-  char* guessing = (char*)malloc(sizeof(char)*(n + 1));
+  int n = strlen(buffer) - 1;
+  char* guessing = (char*)malloc(sizeof(char)*n);
   for(int i = 0; i < n; i++){
     guessing[i] = '_';
   }
-
   guessing[n] = '\0';
   bool complete = false;
   int found = 0;
@@ -44,7 +43,7 @@ int main() {
     printf("\n"); 
     printf("Guess a character: ");
     char guessed;
-    scanf("%c", &guessed);
+    scanf(" %c", &guessed);
     bool thisFound = false;
     for(int j = 0; j < n; j++){
       if(buffer[j] == guessed && guessing[j] != guessed){
@@ -56,7 +55,10 @@ int main() {
     if(thisFound == false){
       printf("Sorry, %c not found!\n", guessed);
     }
-    if(found == n) complete = !complete;
+    if(found == n){
+         complete = !complete;
+         turns--;
+    }
      
  }
   printf("\n");
