@@ -65,7 +65,6 @@ void clear(struct node* top) {
     free(temp);
     temp = NULL; 
   }
-
 }
 
 // Print all nodes in the given stack (from top to bottom)
@@ -82,26 +81,28 @@ void print(struct node* top) {
   }
   free(temp);
   temp = NULL;
-
 }
 
 int main(int argc, char* argv[]) {
+  if(argc != 2){
+    printf("usage: %s \n", argv[0]);
+    exit(1);
+  }
   FILE* infile;
   infile = fopen(argv[1], "r");
   if(infile == NULL){
-    printf("Error: unable to open file %s\n", argv[1]);
+    printf("Cannot open file: %s\n", argv[1]);
     exit(0);
-  } 
+  }
   struct node* stack = NULL;
   int ch;
   int r = 1;
-  int c = 1;
+  int c = 0;
   ch = getc(infile);
   while(ch != EOF){
     ch = fgetc(infile);
     if(ch == '{'){
-      push(ch , r, c, stack);
-      print(stack);
+      stack = push(ch , r, c, stack);
     }
     if(ch == '}'){
       if(stack == NULL){
@@ -110,15 +111,12 @@ int main(int argc, char* argv[]) {
         printf("Found matching brackes:(%d, %d) -> (%d, %d)\n", stack->linenum, stack->colnum, r, c);
         stack = pop(stack);
       }
-      print(stack);
     }
     if(ch == '\n'){
       r += 1;
-      c = 1;
+      c = 0;
     } 
     c+=1;
   }
-
-
  return 0;
 }
