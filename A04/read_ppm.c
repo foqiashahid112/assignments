@@ -4,20 +4,14 @@
 #include "read_ppm.h"
 
 struct ppm_pixel** read_ppm(const char* filename, int* w, int* h) {
-  struct ppm_pixel** array = malloc(sizeof(struct ppm_pixel*) * (*h));
-  for(int i = 0; i < (*h); i++){
-    array[i] = malloc(sizeof(struct ppm_pixel) * (*w));
-  }
-  if(array == NULL){
-    printf("Malloc error\n");
-    return NULL;
-  }
+  //open file
   FILE* infile;
   infile  = fopen(filename, "r");
   if(infile == NULL){
     printf("Cannot open file: %s\n", filename);
     return NULL;
   }
+  //read header
   char magic_number[3];
   char buffer[1000];
   //magic number
@@ -35,6 +29,15 @@ struct ppm_pixel** read_ppm(const char* filename, int* w, int* h) {
   int maxColor;
   fgets(buffer, 1000, infile);
   sscanf(buffer, "%d", &maxColor);
+  //malloc pixels
+   struct ppm_pixel** array = malloc(sizeof(struct ppm_pixel*) * (*h));
+  for(int i = 0; i < (*h); i++){
+    array[i] = malloc(sizeof(struct ppm_pixel) * (*w));
+  }
+  if(array == NULL){
+    printf("Malloc error\n");
+    return NULL;
+  }
   unsigned char r;
   unsigned char g;
   unsigned char b;

@@ -39,8 +39,6 @@ char findSymbol(double intensity){
 }
 
 int main(int argc, char** argv) {
-  // todo
-  FILE* infile;
   char fileName[100];
   if(argc < 2){
     strcpy(fileName, "feep-ascii.ppm");
