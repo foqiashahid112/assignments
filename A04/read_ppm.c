@@ -12,7 +12,7 @@ struct ppm_pixel** read_ppm(const char* filename, int* w, int* h) {
     return NULL;
   }
   //read header
-  char magic_number[3];
+  char magic_number[100];
   char buffer[1000];
   //magic number
   fgets(buffer, 1000, infile);
