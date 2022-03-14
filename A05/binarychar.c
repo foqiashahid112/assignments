@@ -1,7 +1,5 @@
 #include <stdio.h>
 
-
-
 int binaryToDecimal(char* inputBinary){
   int decimal = 0;
   int multiple = 1; //pow(2,0)
@@ -14,11 +12,10 @@ int binaryToDecimal(char* inputBinary){
 
 
 int main() {
-  char input[8];
+  char input[9];
   printf("Enter 8 bits: ");
   scanf("%s", input);
   int decimal = binaryToDecimal(input);
-  printf("binary to decimal %d", decimal);
-  //printf("Your character is: %c\n", character);
+  printf("Your character is: %c\n", decimal);
   return 0;
 }
