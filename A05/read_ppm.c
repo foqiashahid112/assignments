@@ -62,8 +62,7 @@ extern void write_ppm(const char* filename, struct ppm_pixel** pxs, int w, int h
   //Add P6 magic number, blank space, width, height, max color valye, whitespace
   char* header;
   header = malloc(1000);
-  sprintf(header,"P6\n%d %d\n255\n", w,h);
-  fwrite(&header, sizeof(header),1,infile);
+  fprintf(infile, "P6\n%d %d\n255\n", w,h);
   for(int i = 0; i < h; i++){
     for(int j = 0; j < w; j++){
       struct ppm_pixel new_pixel = pxs[i][j];
