@@ -58,6 +58,19 @@ struct ppm_pixel** read_ppm(const char* filename, int* w, int* h) {
 // array of arrays
 extern void write_ppm(const char* filename, struct ppm_pixel** pxs, int w, int h) {
   FILE* infile;
-  infile = fopen(filename, "rb");
-    
+  infile = fopen(filename, "wb");//w for write, b for binary
+  //Add P6 magic number, blank space, width, height, max color valye, whitespace
+  char* header;
+  header = malloc(1000);
+  sprintf(header,"P6\n%d %d\n255\n", w,h);
+  fwrite(&header, sizeof(header),1,infile);
+  for(int i = 0; i < h; i++){
+    for(int j = 0; j < w; j++){
+      struct ppm_pixel new_pixel = pxs[i][j];
+      fwrite(&new_pixel, sizeof(struct ppm_pixel), 1, infile);     
+    } 
+  }
+  free(header);
+  header = NULL; 
+  fclose(infile);
 }
