@@ -59,7 +59,6 @@ void fragstats(void* buffers[], int len) {
      freeChunks++;
      int tempFree = next->size;
      free_average += tempFree;
-     free_average += tempFree; 
      if(tempFree > free_largest) free_largest = tempFree;
      if(tempFree < free_smallest) free_smallest = tempFree;
      next = next->next;
