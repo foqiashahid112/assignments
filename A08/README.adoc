@@ -23,13 +23,6 @@ When the first printf is called, there is an interal malloc call to allocate spa
 How many bytes does `mylloc_list.c` allocate when the program ends? Explain why
 this amount makes sense.
 
-mylloc_list.c allocated 2200 bytes of memory. 
-When printf is called, there is an internal call to malloc to make space for a buffer.
-The default value for the buffer is 1040.
-
-How many bytes does `mylloc_list.c` allocate when the program ends? Explain why
-this amount makes sense.
-
 It allocated 2200 bytes. This makes sense because 100 bytes is allocated when malloc is called each time. This call happens 10 times. In addition to allocating the 100 bytes, 5 bytes is also allocated for chunk struct. In addition to multiple pointers being stored in the function for malloc, there is also 5 additional bytes used for flist. 
 
 = Fragementation
