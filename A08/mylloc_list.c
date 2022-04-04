@@ -13,22 +13,22 @@ void *malloc (size_t size) {
   if (size == 0){
     return NULL;
   }
-
+  
   struct chunk *next = flist ;
-       	struct chunk *prev = NULL;
-	while(next != NULL) {
-		if (next->size >= size) {
+  struct chunk *prev = NULL;
+  while(next != NULL) {
+	if (next->size >= size) {
 			if(prev != NULL) {
-			       	prev->next = next->next;
-			} else {
-				flist = next->next;
-			}
-			next->inUse= size;
-			return (void*)(next + 1);
+			prev->next = next->next;
 		} else {
-			prev = next;
-			next = next->next;
-	       	}
+			flist = next->next;
+		}
+		next->inUse= size;
+		return (void*)(next + 1);
+	} else {
+		prev = next;
+		next = next->next;
+	}
 	}
 
 
@@ -61,6 +61,7 @@ void fragstats(void* buffers[], int len) {
      freeChunks++;
      int tempFree = next->size;
      free_average += tempFree;
+     free_average += tempFree; 
      if(tempFree > free_largest) free_largest = tempFree;
      if(tempFree < free_smallest) free_smallest = tempFree;
      next = next->next;
@@ -73,6 +74,7 @@ void fragstats(void* buffers[], int len) {
      if(buffers[i] != NULL){
      	usedChunks++;
 	struct chunk *cnk = (struct chunk*)((struct chunk*) buffers[i] - 1 );
+	struct chunk *cnk = (struct chunk*)((struct chunk*) buffers[i] - 1 );	
 	int tempSize = cnk->size;//temp stores the size associated with this used memory chunk
 	int tempInUse = cnk->inUse;
 	int tempUnUsed = tempSize - tempInUse;
@@ -88,5 +90,6 @@ void fragstats(void* buffers[], int len) {
   unused_average = unused_average / usedChunks;
   printf("Total blocks: %d, Free: %d, Used: %d\n", total, freeChunks, usedChunks);
   printf("Internal unused: total: %d average: %0.1f smallest: %d largest: %d\n", internal , unused_average, unused_smallest, unused_largest);
+  printf("Internal unused: total: %d average: %0.1f smallest: %d largest: %d\n", internal , unused_average, unused_smallest, unused_largest);  
   printf("External unused: total: %d average: %0.1f smallest: %d largest: %d\n", external, free_average, free_smallest, free_largest);
 }
