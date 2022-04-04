@@ -17,21 +17,19 @@ void *malloc (size_t size) {
   struct chunk *next = flist ;
   struct chunk *prev = NULL;
   while(next != NULL) {
-	if (next->size >= size) {
-			if(prev != NULL) {
-			prev->next = next->next;
-		} else {
-			flist = next->next;
-		}
-		next->inUse= size;
-		return (void*)(next + 1);
+     if (next->size >= size) {
+	if(prev != NULL) {
+	   prev->next = next->next;
 	} else {
-		prev = next;
-		next = next->next;
+	   flist = next->next;
 	}
-	}
-
-
+	next->inUse= size;
+	return (void*)(next + 1);
+      }else {
+	prev = next;
+	next = next->next;
+      }
+  }
   void *memory = sbrk(size + sizeof(struct chunk));
   if (memory == (void *) -1) {
     return NULL;
@@ -44,9 +42,9 @@ void *malloc (size_t size) {
 
 void free(void *memory) {
   if(memory != NULL){
-	  struct chunk *cnk = (struct chunk*)((struct chunk*)memory - 1);
-	  cnk->next = flist;
-	  flist = cnk;
+     struct chunk *cnk = (struct chunk*)((struct chunk*)memory - 1);
+     cnk->next = flist;
+     flist = cnk;
   }
   return;
 }
@@ -74,7 +72,6 @@ void fragstats(void* buffers[], int len) {
      if(buffers[i] != NULL){
      	usedChunks++;
 	struct chunk *cnk = (struct chunk*)((struct chunk*) buffers[i] - 1 );
-	struct chunk *cnk = (struct chunk*)((struct chunk*) buffers[i] - 1 );	
 	int tempSize = cnk->size;//temp stores the size associated with this used memory chunk
 	int tempInUse = cnk->inUse;
 	int tempUnUsed = tempSize - tempInUse;
@@ -90,6 +87,5 @@ void fragstats(void* buffers[], int len) {
   unused_average = unused_average / usedChunks;
   printf("Total blocks: %d, Free: %d, Used: %d\n", total, freeChunks, usedChunks);
   printf("Internal unused: total: %d average: %0.1f smallest: %d largest: %d\n", internal , unused_average, unused_smallest, unused_largest);
-  printf("Internal unused: total: %d average: %0.1f smallest: %d largest: %d\n", internal , unused_average, unused_smallest, unused_largest);  
   printf("External unused: total: %d average: %0.1f smallest: %d largest: %d\n", external, free_average, free_smallest, free_largest);
 }
