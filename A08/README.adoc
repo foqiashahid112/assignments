@@ -1,35 +1,41 @@
 = Hardware specifications
 
 Where did your run your tests? A laptop, or goldengate?
+
 goldengate
 
 What are the performance specifications of the machine: number and speed of
 processors, size of RAM? (use `lscpu` and `free -m`)
 
 Number of Processors: 64
-Speed of Processors:
-Size of RAM:
+Speed of Processors: 4039.585 MHz
+Size of RAM: total - 97608472 kB (using command less /proc/meminfo)
+	Mem: 95320 (unsure of units) (using command free -m)
 
 = Allocations
 
 In `simple.c`, where does the increase in 1040 bytes come from?
 Why is the value 1040 bytes?
+
 It is the difference of the initial and current memory addresses. This difference is of 410 in hexidemcial, i.e, 1040 bytes.
 When the first printf is called, there is an interal malloc call to allocate space for a buffer for a print value. The default size of the buffer is 1040.
 
 How many bytes does `mylloc_list.c` allocate when the program ends? Explain why
 this amount makes sense.
+
 mylloc_list.c allocated 2200 bytes of memory. 
 When printf is called, there is an internal call to malloc to make space for a buffer.
 The default value for the buffer is 1040.
 
 How many bytes does `mylloc_list.c` allocate when the program ends? Explain why
 this amount makes sense.
-It allocated 2200 bytes at the end.
+
+It allocated 2200 bytes. This makes sense because 100 bytes is allocated when malloc is called each time. This call happens 10 times. In addition to allocating the 100 bytes, 5 bytes is also allocated for chunk struct. In addition to multiple pointers being stored in the function for malloc, there is also 5 additional bytes used for flist. 
 
 = Fragementation
 
 What is fragmentation? What is the difference between internal and external fragmentation?
+
 Fragmentation is the idea of unused memory.
 Internal fragmentation the idea that there will be unused space in a block when memory is allocated from flist. 
 External fragmentation is the idea of space being inaccessible due to it being divided into small chunks. This occurs
