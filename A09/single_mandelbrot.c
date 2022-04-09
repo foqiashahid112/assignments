@@ -52,8 +52,8 @@ int main(int argc, char* argv[]) {
   gettimeofday(&tstart, NULL);
   for(int i = 0; i < size; i++){
     for(int j = 0; j < size; j++){
-      float xfrac = (float) i / (float) size;
-      float yfrac = (float) j / (float) size;
+      float xfrac = (float) j / (float) size;
+      float yfrac = (float) i / (float) size;
       float x_0 = xmin + xfrac * (xmax - xmin);
       float y_0 = ymin + yfrac * (ymax - ymin);
       
