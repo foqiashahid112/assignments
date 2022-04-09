@@ -57,8 +57,8 @@ int main(int argc, char* argv[]) {
       float x_0 = xmin + xfrac * (xmax - xmin);
       float y_0 = ymin + yfrac * (ymax - ymin);
       
-      int x = 0;
-      int y = 0;
+      float x = 0;
+      float y = 0;
       int iter = 0;
       while(iter < maxIterations && x*x + y*y < 2*2){
         float xtmp = x*x - y*y + x_0;
