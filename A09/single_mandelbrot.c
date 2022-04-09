@@ -34,7 +34,7 @@ int main(int argc, char* argv[]) {
   srand(time(0));
   
   struct ppm_pixel* palette_colors;
-  palette_colors = malloc(maxIterations * sizeof(struct ppm_pixel));
+  palette_colors = (struct ppm_pixel*) malloc(maxIterations * sizeof(struct ppm_pixel));
   
   //generate palette 
   for(int i = 0; i < maxIterations; i++){
@@ -68,7 +68,9 @@ int main(int argc, char* argv[]) {
       }
       struct ppm_pixel color;
       if(iter < maxIterations){
-        color = palette_colors[iter];
+        color.red = palette_colors[iter].red;
+        color.blue = palette_colors[iter].blue;
+        color.green = palette_colors[iter].green;
       }else{
         color.red = 0;
         color.blue = 0;
