@@ -120,15 +120,27 @@ int main(int argc, char* argv[]) {
     int pid = fork();
     if(pid == 0){ //child
       if(i == 0){
+      printf("%d) Sub-image block: cols (%d, %d) to rows (%d, %d)\n", pid, 0, size/2, 0, size/2);      
       computeMandelbrot(size, maxIterations,palette_colors,array_pixels,xmin,xmax,ymin,ymax,0,size/2, 0, size/2);
       } else if(i == 1){
+	printf("%d) Sub-image block: cols (%d, %d) to rows (%d, %d)\n", pid,size/2,size,0,size/2);
       computeMandelbrot(size, maxIterations,palette_colors,array_pixels,xmin,xmax,ymin,ymax,size/2,size,0,size/2);
       } else if(i == 2){
+	printf("%d) Sub-image block: cols (%d, %d) to rows (%d, %d)\n", pid, 0, size/2, size/2, size);
       computeMandelbrot(size, maxIterations,palette_colors,array_pixels,xmin,xmax,ymin,ymax,0,size/2,size/2,size);
       } else if(i == 3){
-      computeMandelbrot(size, maxIterations,palette_colors,array_pixels,xmin,xmax,ymin,ymax,size/2,size,size/2,size);
+      	printf("%d) Sub-image block: cols (%d, %d) to rows (%d, %d)\n", pid,size/2,size,size/2, size);
+	      computeMandelbrot(size, maxIterations,palette_colors,array_pixels,xmin,xmax,ymin,ymax,size/2,size,size/2,size);
       }
+   }else{
+     printf("Lauched child process: %d\n", pid);
    }
+  }
+
+  for(int i = 0; i < numProcesses; i++){
+  	int status;
+	int pid = wait(&status);
+	printf("Child process complete: %d\n", getpid());
   }
 
   gettimeofday(&tend, NULL);
@@ -140,7 +152,17 @@ int main(int argc, char* argv[]) {
   sprintf(outputFile, "mandelbrot-%d-%ld.ppm", size,time(0));
   write_ppm(outputFile, array_pixels, size, size);
   printf("Writing file: %s\n", outputFile);
- 
+
+  if (shmdt(array_pixels) == -1) {
+    perror("Error: cannot detatch from shared memory\n");
+    exit(1);
+  }
+
+  if (shmctl(shmid, IPC_RMID, 0) == -1) {
+    perror("Error: cannot remove shared memory\n");
+    exit(1);
+  }   
+
   //Free space
   for(int i = 0; i < size; i++){
     free(array_pixels[i]);
