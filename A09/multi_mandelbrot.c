@@ -116,7 +116,7 @@ int main(int argc, char* argv[]) {
   gettimeofday(&tstart, NULL);  
     
   
-  for(int i = 0; i < numProcesses; i++){
+  for(int i = 0; i < numProcesses/2; i++){
     int pid = fork();
     if(pid == 0){ //child
       if(i == 0){
@@ -137,7 +137,7 @@ int main(int argc, char* argv[]) {
    }
   }
 
-  for(int i = 0; i < numProcesses; i++){
+  for(int i = 0; i < numProcesses/2; i++){
   	int status;
 	int pid = wait(&status);
 	printf("Child process complete: %d\n", getpid());
