@@ -9,9 +9,9 @@
 #include <sys/ipc.h>
 #include "read_ppm.h"
 
-void computeMandelbrot(int size, int maxIterations, struct ppm_pixel* palette_colors, struct ppm_pixel** array_pixels, float xmin, float xmax, float ymin, float ymax, int start_R, int end_R,int start_C,int end_C){
+void computeMandelbrot(int size, int maxIterations, struct ppm_pixel* palette_colors, struct ppm_pixel*array_pixels, float xmin, float xmax, float ymin, float ymax, int start_R, int end_R,int start_C,int end_C){
 
-for(int i = start_R; i < end_R; i++){
+  for(int i = start_R; i < end_R; i++){
     for(int j = start_C; j < end_C; j++){
       float xfrac = (float) j / (float) size;
       float yfrac = (float) i / (float) size;
@@ -38,10 +38,9 @@ for(int i = start_R; i < end_R; i++){
         color.green = 0;
       }
       //write color to image at location (row, col)
-      array_pixels[i][j] = color;
+      array_pixels[i*size + j] = color;
     } 
   }
-
 }
 
 
@@ -87,49 +86,34 @@ int main(int argc, char* argv[]) {
   } 
  
   int shmid;
-  shmid = shmget(IPC_PRIVATE, sizeof(struct ppm_pixel*) * size, 0644 | IPC_CREAT);
+  shmid = shmget(IPC_PRIVATE, sizeof(struct ppm_pixel) * size * size, 0644 | IPC_CREAT);
   if (shmid == -1) {
     perror("Error: cannot initialize shared memory\n");
     exit(1);
   }
 
-  struct ppm_pixel** array_pixels = (struct ppm_pixel**) shmat(shmid, NULL, 0);
+  struct ppm_pixel* array_pixels = shmat(shmid, NULL, 0);
   if (array_pixels == (void*) -1) {                                              
     perror("Error: cannot access shared memory\n");                              
     exit(1);                                                                     
   }   
-  int shmid2;
-  shmid2 = shmget(IPC_PRIVATE, sizeof(struct ppm_pixel) * size, 0644 | IPC_CREAT);
-  if (shmid2 == -1) {                                                             
-    perror("Error: cannot initialize shared memory\n");                          
-    exit(1);                                                                     
-  }  
-  
-  for(int i = 0; i < size; i++){
-    array_pixels[i] = shmat(shmid2, NULL, 0);
-    if(array_pixels[i] == (void*) -1){
-      perror("Error: cannot initialize shared memory\n");
-      exit(1);
-    } 
-  }
   
   gettimeofday(&tstart, NULL);  
-    
   
   for(int i = 0; i < numProcesses; i++){
     int pid = fork();
     if(pid == 0){ //child
       if(i == 0){
-      printf("%d) Sub-image block: cols (%d, %d) to rows (%d, %d)\n", pid, 0, size/2, 0, size/2);      
-      computeMandelbrot(size, maxIterations,palette_colors,array_pixels,xmin,xmax,ymin,ymax,0,size/2, 0, size/2);
-      } else if(i == 1){
-	printf("%d) Sub-image block: cols (%d, %d) to rows (%d, %d)\n", pid,size/2,size,0,size/2);
-      computeMandelbrot(size, maxIterations,palette_colors,array_pixels,xmin,xmax,ymin,ymax,size/2,size,0,size/2);
-      } else if(i == 2){
-	printf("%d) Sub-image block: cols (%d, %d) to rows (%d, %d)\n", pid, 0, size/2, size/2, size);
-      computeMandelbrot(size, maxIterations,palette_colors,array_pixels,xmin,xmax,ymin,ymax,0,size/2,size/2,size);
-      } else if(i == 3){
-      	printf("%d) Sub-image block: cols (%d, %d) to rows (%d, %d)\n", pid,size/2,size,size/2, size);
+        printf("%d) Sub-image block: cols (%d, %d) to rows (%d, %d)\n", getpid(), 0, size/2, 0, size/2);      
+        computeMandelbrot(size, maxIterations,palette_colors,array_pixels,xmin,xmax,ymin,ymax,0,size/2, 0, size/2);
+      }else if(i == 1){
+        printf("%d) Sub-image block: cols (%d, %d) to rows (%d, %d)\n", getpid(),size/2,size,0,size/2);
+        computeMandelbrot(size, maxIterations,palette_colors,array_pixels,xmin,xmax,ymin,ymax,size/2,size,0,size/2);
+      }else if(i == 2){
+        printf("%d) Sub-image block: cols (%d, %d) to rows (%d, %d)\n", getpid(), 0, size/2, size/2, size);
+        computeMandelbrot(size, maxIterations,palette_colors,array_pixels,xmin,xmax,ymin,ymax,0,size/2,size/2,size);
+      }else if(i == 3){
+      	printf("%d) Sub-image block: cols (%d, %d) to rows (%d, %d)\n", getpid(),size/2,size,size/2, size);
 	      computeMandelbrot(size, maxIterations,palette_colors,array_pixels,xmin,xmax,ymin,ymax,size/2,size,size/2,size);
       }
    }else{
@@ -147,7 +131,6 @@ int main(int argc, char* argv[]) {
   timer = tend.tv_sec - tstart.tv_sec + (tend.tv_usec - tstart.tv_usec)/1.e6;
   printf("Computed mandelbrot set (%dx%d) in %g\n", size, size, timer);
 
-//write to file
   char outputFile[1000];
   sprintf(outputFile, "mandelbrot-%d-%ld.ppm", size,time(0));
   write_ppm(outputFile, array_pixels, size, size);
@@ -163,10 +146,6 @@ int main(int argc, char* argv[]) {
     exit(1);
   }   
 
-  //Free space
-  for(int i = 0; i < size; i++){
-    free(array_pixels[i]);
-  }
   free(array_pixels);
   free(palette_colors);
   array_pixels = NULL;

@@ -49,7 +49,7 @@ struct ppm_pixel** read_ppm(const char* filename, int* w, int* h) {
   return array; 
 }
 
-void write_ppm(const char* filename, struct ppm_pixel** pixels, int w, int h) {
+void write_ppm(const char* filename, struct ppm_pixel* pixels, int w, int h) {
   FILE* infile;
   infile = fopen(filename, "wb");//w for write, b for binary
   //Add P6 magic number, blank space, width, height, max color valye, whitespace
@@ -58,7 +58,7 @@ void write_ppm(const char* filename, struct ppm_pixel** pixels, int w, int h) {
   fprintf(infile, "P6\n%d %d\n255\n", w,h);
   for(int i = 0; i < h; i++){
     for(int j = 0; j < w; j++){
-      struct ppm_pixel new_pixel = pixels[i][j];
+      struct ppm_pixel new_pixel = pixels[(i*h) + j];
       fwrite(&new_pixel, sizeof(struct ppm_pixel), 1, infile);     
     } 
   }
