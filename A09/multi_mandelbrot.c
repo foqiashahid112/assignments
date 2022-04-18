@@ -9,7 +9,7 @@
 #include <sys/ipc.h>
 #include "read_ppm.h"
 
-void computeMandelbrot(int size, int maxIterations, struct ppm_pixel* palette_colors, struct ppm_pixel*array_pixels, float xmin, float xmax, float ymin, float ymax, int start_R, int end_R,int start_C,int end_C){
+void computeMandelbrot(int size, int maxIterations, struct ppm_pixel* palette_colors, struct ppm_pixel* array_pixels, float xmin, float xmax, float ymin, float ymax, int start_R, int end_R,int start_C,int end_C){
 
   for(int i = start_R; i < end_R; i++){
     for(int j = start_C; j < end_C; j++){
