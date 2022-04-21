@@ -16,7 +16,7 @@ struct thread_data {
 
 void *findDot(void *userdata){
   struct thread_data *data = (struct thread_data *) userdata;
-  int dot_product;
+  int dot_product = 0;
   for (int i = data->start_index; i < data->end_index; i++) {
     dot_product += data->v[i] * data->u[i];  
   }
@@ -47,7 +47,7 @@ int main(int argc, char *argv[]) {
     pthread_create(&threads[i], NULL, findDot, (void*) &data[i]);   
   } 
 
-  int gDotproduct;
+  int gDotproduct = 0;
   /* Join all the threads. Main will pause in this loop until all threads
    * have returned from the thread function. */
   for (int i = 0; i < 4; i++) {
