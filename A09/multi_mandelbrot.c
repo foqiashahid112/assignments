@@ -106,18 +106,34 @@ int main(int argc, char* argv[]) {
       if(i == 0){
         printf("%d) Sub-image block: cols (%d, %d) to rows (%d, %d)\n", getpid(), 0, size/2, 0, size/2);      
         computeMandelbrot(size, maxIterations,palette_colors,array_pixels,xmin,xmax,ymin,ymax,0,size/2, 0, size/2);
+	free(palette_colors);
+	palette_colors = NULL;
+	//free(array_pixels);
+	//array_pixels = NULL;
 	exit(0);
       }else if(i == 1){
         printf("%d) Sub-image block: cols (%d, %d) to rows (%d, %d)\n", getpid(),size/2,size,0,size/2);
         computeMandelbrot(size, maxIterations,palette_colors,array_pixels,xmin,xmax,ymin,ymax,size/2,size,0,size/2);
+	free(palette_colors);
+	palette_colors = NULL;
+	//free(array_pixels);
+	//array_pixels = NULL;
 	exit(0);
       }else if(i == 2){
         printf("%d) Sub-image block: cols (%d, %d) to rows (%d, %d)\n", getpid(), 0, size/2, size/2, size);
         computeMandelbrot(size, maxIterations,palette_colors,array_pixels,xmin,xmax,ymin,ymax,0,size/2,size/2,size);
+	free(palette_colors);
+	palette_colors = NULL;
+	//free(array_pixels);
+	//array_pixels = NULL;
 	exit(0);
       }else if(i == 3){
       	printf("%d) Sub-image block: cols (%d, %d) to rows (%d, %d)\n", getpid(),size/2,size,size/2, size);
 	      computeMandelbrot(size, maxIterations,palette_colors,array_pixels,xmin,xmax,ymin,ymax,size/2,size,size/2,size);
+	      free(palette_colors);
+	      palette_colors = NULL;
+	      //free(array_pixels);
+	      //array_pixels = NULL;
 	      exit(0);
       }
    }else{
@@ -149,7 +165,10 @@ int main(int argc, char* argv[]) {
     perror("Error: cannot remove shared memory\n");
     exit(1);
   }   
-
+  free(palette_colors);
+  palette_colors = NULL;
+  //free(array_pixels);
+  //array_pixels = NULL;
   return 0;
 
 }
