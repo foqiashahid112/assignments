@@ -7,8 +7,6 @@
 #include <pthread.h>
 #include "read_ppm.h"
 
-
-
 struct thread_data{
 	int id;
 	int size;
@@ -29,7 +27,7 @@ pthread_mutex_t mutex;
 
 void *find_image(void *userdata){
 	struct thread_data *data = (struct thread_data *) userdata;
-	pthread_mutex_lock(&mutex);
+	//pthread_mutex_lock(&mutex);
 	printf("Thread %d) sub-image block: cols (%d, %d) to rows (%d,%d)\n", data->id, data->start_R, data->end_R, data->start_C,data->end_C);
 	 for(int i = data->start_R ; i < data->end_R; i++){
 	    for(int j = data->start_C ; j < data->end_C; j++){
@@ -58,11 +56,13 @@ void *find_image(void *userdata){
 		color.green = 0;
 	      }
 	      //write color to image at location (row, col)
+	      pthread_mutex_lock(&mutex);
 	      data->array_pixels[i*data->size + j] = color;
+	      pthread_mutex_unlock(&mutex);
 	    }
 	 }
 	printf("Thread %d) finished\n",data->id);	
-	pthread_mutex_unlock(&mutex);
+	//pthread_mutex_unlock(&mutex);
 	return NULL;
 }
 
