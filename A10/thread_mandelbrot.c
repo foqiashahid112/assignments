@@ -31,8 +31,8 @@ void *find_image(void *userdata){
 	printf("Thread %d) sub-image block: cols (%d, %d) to rows (%d,%d)\n", data->id, data->start_R, data->end_R, data->start_C,data->end_C);
 	 for(int i = data->start_R ; i < data->end_R; i++){
 	    for(int j = data->start_C ; j < data->end_C; j++){
-	      float xfrac = (float) j / (float) data->size;
-	      float yfrac = (float) i / (float) data->size;
+	      float xfrac = (float) i / (float) data->size;
+	      float yfrac = (float) j / (float) data->size;
 	      float x_0 = data->xmin + xfrac * (data->xmax - data->xmin);
 	      float y_0 = data->ymin + yfrac * (data->ymax - data->ymin);
 
@@ -40,24 +40,24 @@ void *find_image(void *userdata){
 	      float y = 0;
 	      int iter = 0;
 	      while(iter < data->maxIterations && x*x + y*y < 2*2){
-		float xtmp = x*x - y*y + x_0;
-		y = 2*x*y + y_0;
-		x = xtmp;
-		iter++;
+          float xtmp = x*x - y*y + x_0;
+          y = 2*x*y + y_0;
+          x = xtmp;
+          iter++;
 	      }
 	      struct ppm_pixel color;
 	      if(iter < data->maxIterations){
-		color.red = data->palette_colors[iter].red;
-		color.blue = data->palette_colors[iter].blue;
-		color.green = data->palette_colors[iter].green;
+          color.red = data->palette_colors[iter].red;
+          color.blue = data->palette_colors[iter].blue;
+          color.green = data->palette_colors[iter].green;
 	      }else{
-		color.red = 0;
-		color.blue = 0;
-		color.green = 0;
+          color.red = 0;
+          color.blue = 0;
+          color.green = 0;
 	      }
 	      //write color to image at location (row, col)
 	      pthread_mutex_lock(&mutex);
-	      data->array_pixels[i*data->size + j] = color;
+	      data->array_pixels[j*data->size + i] = color;
 	      pthread_mutex_unlock(&mutex);
 	    }
 	 }
@@ -117,41 +117,38 @@ int main(int argc, char* argv[]) {
   struct thread_data data[4];
   int subsize = size / 4;
   for(int i = 0; i < 4; i++){
-	printf("This is loop number %d\n", i);
-	data[i].id = i;
- 	data[i].size = subsize;
-	data[i].xmin = xmin;
-	data[i].xmax = xmax;
-	data[i].ymin = ymin;
-	data[i].ymax = ymax;
-	data[i].maxIterations = maxIterations;
-	if(i == 0){
-	data[i].start_R = 0;
-	data[i].end_R = size/2;
-	data[i].start_C = 0;
-	data[i].end_C = size/2;
-	} else if(i == 1){
-	data[i].start_R = size/2;
-	data[i].end_R = size;
-	data[i].start_C = 0;
-	data[i].end_C = size/2;
-
-	} else if (i == 2){
-	data[i].start_R = 0;
-	data[i].end_R = size/2;
-	data[i].start_C = size/2;
-	data[i].end_C = size;
-
-	} else if (i == 3){
-	data[i].start_R = size/2;
-	data[i].end_R = size;
-	data[i].start_C = size/2;
-	data[i].end_C = size;
-
-	}
-	data[i].palette_colors = palette_colors;
-	data[i].array_pixels = array_pixels;
-	pthread_create(&threads[i], NULL, find_image, (void*) &data[i]);
+    printf("This is loop number %d\n", i);
+    data[i].id = i;
+    data[i].size = subsize;
+    data[i].xmin = xmin;
+    data[i].xmax = xmax;
+    data[i].ymin = ymin;
+    data[i].ymax = ymax;
+    data[i].maxIterations = maxIterations;
+    if(i == 0){
+      data[i].start_R = 0;
+      data[i].end_R = size/2;
+      data[i].start_C = 0;
+      data[i].end_C = size/2;
+    } else if(i == 1){
+      data[i].start_R = size/2;
+      data[i].end_R = size;
+      data[i].start_C = 0;
+      data[i].end_C = size/2;
+    } else if (i == 2){
+      data[i].start_R = 0;
+      data[i].end_R = size/2;
+      data[i].start_C = size/2;
+      data[i].end_C = size;
+    }else if (i == 3){
+      data[i].start_R = size/2;
+      data[i].end_R = size;
+      data[i].start_C = size/2;
+      data[i].end_C = size;
+    }
+    data[i].palette_colors = palette_colors;
+    data[i].array_pixels = array_pixels;
+    pthread_create(&threads[i], NULL, find_image, (void*) &data[i]);
   }
   
   pthread_mutex_destroy(&mutex); 
@@ -167,7 +164,6 @@ int main(int argc, char* argv[]) {
 
   for (int i = 0; i < 4; i++) {
     pthread_join(threads[i], NULL);
-
   }
 
   free(palette_colors);
