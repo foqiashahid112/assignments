@@ -105,7 +105,7 @@ void *find_image(void *userdata){
         //int local_maxCount = 0;
         pthread_mutex_lock(&mutex);
         count[j*size + i] = count[j*size + i] + 1;
-        if(count[j*size + i] > axCount){
+        if(count[j*size + i] > maxCount){
 		      maxCount = count[j*size + i];
 	      }
         pthread_mutex_unlock(&mutex);
@@ -122,7 +122,7 @@ void *find_image(void *userdata){
       float value = 0;
 
       if(count[j*size + i] > 0){
-        value = log(count[j*size + i]) / log(maxCount[id]);
+        value = log(count[j*size + i]) / log(maxCount);
         value = pow(value, factor);
       }
       struct ppm_pixel color;
@@ -242,7 +242,6 @@ int main(int argc, char* argv[]) {
     data[i].palette_colors = palette_colors;
     data[i].array_pixels = array_pixels;
     data[i].count = count;
-    data[i].maxCount = maxCount;
     pthread_create(&threads[i], NULL, find_image, (void*) &data[i]);
   }
   
