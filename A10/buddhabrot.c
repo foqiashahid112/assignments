@@ -123,7 +123,7 @@ void *find_image(void *userdata){
       int value = 0;
 
       if(count[j*size + i] > 0){
-        value = log(count[j*size + i]) / log(*maxCount);
+        value = log(count[j*size + i]) / log(maxCount[id]);
         value = pow(value, factor);
       }
       struct ppm_pixel color;
