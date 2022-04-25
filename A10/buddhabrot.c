@@ -29,6 +29,8 @@ struct thread_data{
 	int* maxCount;
 };
 
+static unsigned long long maxCount = 0;
+
 pthread_mutex_t mutex;
 static pthread_barrier_t barrier; 
 
@@ -49,7 +51,7 @@ void *find_image(void *userdata){
 	int end_R = data->end_R;
 	int start_C = data->start_C;
 	int end_C = data->end_C;
-	int* maxCount = data->maxCount;
+	//int* maxCount = data->maxCount;
 
 
 	printf("Thread %d) sub-image block: cols (%d, %d) to rows (%d,%d)\n", data->id, data->start_R, data->end_R, data->start_C,data->end_C);
@@ -84,31 +86,30 @@ void *find_image(void *userdata){
 	  for(int j = start_C ; j < end_C; j++){
       //if (row,col) belongs to the mandelbrot set, continue
       if(escapes[j* size + i] == true) continue;
-	      float xfrac = (float) i / (float) size;
-	      float yfrac = (float) j / (float) size;
-	      float x_0 = xmin + xfrac * (xmax - xmin);
-	      float y_0 = ymin + yfrac * (ymax - ymin);
+	    float xfrac = (float) i / (float) size;
+	    float yfrac = (float) j / (float) size;
+	    float x_0 = xmin + xfrac * (xmax - xmin);
+	    float y_0 = ymin + yfrac * (ymax - ymin);
 
-	      float x = 0;
-	      float y = 0;
-	      while(x*x + y*y < 2*2){
-          float xtmp = x*x - y*y + x_0;
-          y = 2*x*y + y_0;
-          x = xtmp;
-          int yrow = round(size * (y - ymin)/(ymax - ymin));
-          int xcol = round(size * (x - xmin)/(xmax - xmin));
-          if (yrow < 0 || yrow >= size) continue; // out of range
-          if (xcol < 0 || xcol >= size) continue; // out of range
+	    float x = 0;
+	    float y = 0;
+	    while(x*x + y*y < 2*2){
+        float xtmp = x*x - y*y + x_0;
+        y = 2*x*y + y_0;
+        x = xtmp;
+        int yrow = round(size * (y - ymin)/(ymax - ymin));
+        int xcol = round(size * (x - xmin)/(xmax - xmin));
+        if (yrow < 0 || yrow >= size) continue; // out of range
+        if (xcol < 0 || xcol >= size) continue; // out of range
 
-          //increment count at (yrow, xcol)
-          pthread_mutex_lock(&mutex);
-          count[j*size + i] += 1;
-          //update max count
-          if(count[j*size + i] > maxCount[id]){
-		  maxCount[id] = count[j*size + i];
-	  }
-          pthread_mutex_unlock(&mutex);
+        //int local_maxCount = 0;
+        pthread_mutex_lock(&mutex);
+        count[j*size + i] = count[j*size + i] + 1;
+        if(count[j*size + i] > axCount){
+		      maxCount = count[j*size + i];
 	      }
+        pthread_mutex_unlock(&mutex);
+	    }
 	  }
   }
 
@@ -131,13 +132,8 @@ void *find_image(void *userdata){
       array_pixels[j*size + i] = color;
 	  }
   }
-
-
-  
-
 	printf("Thread %d) finished\n",id);	
-	//pthread_mutex_unlock(&mutex);
-	return NULL;
+  return NULL;
 }
 
 
@@ -149,7 +145,7 @@ int main(int argc, char* argv[]) {
   float ymax = 1.12;
   int maxIterations = 1000;
   int numProcesses = 4;
-
+  
   int opt;
   while ((opt = getopt(argc, argv, ":s:l:r:t:b:p:")) != -1) {
     switch (opt) {
@@ -162,6 +158,7 @@ int main(int argc, char* argv[]) {
         "-b <ymin> -t <ymax> -p <numProcesses>\n", argv[0]); break;
     }
   }
+
   printf("Generating mandelbrot with size %dx%d\n", size, size);
   printf("  Num processes = %d\n", numProcesses);
   printf("  X range = [%.4f,%.4f]\n", xmin, xmax);
@@ -188,11 +185,10 @@ int main(int argc, char* argv[]) {
   for(int i = 0; i < 4; i ++){
     maxCount[i] = 0;
   } 
-  // generate pallet
+
   struct ppm_pixel* palette_colors;
   palette_colors = (struct ppm_pixel*) malloc(maxIterations * sizeof(struct ppm_pixel));
 
-  //generate palette
   for(int i = 0; i < maxIterations; i++){
     palette_colors[i].red = rand() % 255;
     palette_colors[i].green = rand() % 255;
