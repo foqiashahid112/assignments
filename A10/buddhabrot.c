@@ -52,7 +52,7 @@ void *find_image(void *userdata){
   int maxCount = data->maxCount;
 
 
-	pthread_mutex_lock(&mutex);
+	//pthread_mutex_lock(&mutex);
 	printf("Thread %d) sub-image block: cols (%d, %d) to rows (%d,%d)\n", data->id, data->start_R, data->end_R, data->start_C,data->end_C);
 	 //Step 1:
    for(int i = start_R ; i < end_R; i++){
@@ -103,9 +103,11 @@ void *find_image(void *userdata){
           if (xcol < 0 || xcol >= size) continue; // out of range
 
           //increment count at (yrow, xcol)
+          pthread_mutex_lock(&mutex);
           count[j*size + i] += 1;
           //update max count
           if(count[j*size + i] > maxCount) maxCount = count[j*size + i];
+          pthread_mutex_unlock(&mutex);
 	      }
 	  }
   }
@@ -134,7 +136,7 @@ void *find_image(void *userdata){
   
 
 	printf("Thread %d) finished\n",id);	
-	pthread_mutex_unlock(&mutex);
+	//pthread_mutex_unlock(&mutex);
 	return NULL;
 }
 
