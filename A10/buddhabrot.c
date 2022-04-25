@@ -82,6 +82,7 @@ void *find_image(void *userdata){
     }
 
   //Step 2: Compute visited counts
+  long long local_maxCount = 0;
   for(int i = start_R ; i < end_R; i++){
 	  for(int j = start_C ; j < end_C; j++){
       //if (row,col) belongs to the mandelbrot set, continue
@@ -104,9 +105,9 @@ void *find_image(void *userdata){
 
         //int local_maxCount = 0;
         pthread_mutex_lock(&mutex);
-        count[j*size + i] = count[j*size + i] + 1;
-        if(count[j*size + i] > maxCount){
-		      maxCount = count[j*size + i];
+        count[j*size + i] += 1;
+        if(count[j*size + i] > local_maxCount){
+		     local_maxCount = count[j*size + i];
 	      }
         pthread_mutex_unlock(&mutex);
 	    }
@@ -122,7 +123,7 @@ void *find_image(void *userdata){
       float value = 0;
 
       if(count[j*size + i] > 0){
-        value = log(count[j*size + i]) / log(maxCount);
+        value = log(count[j*size + i]) / log(local_maxCount);
         value = pow(value, factor);
       }
       struct ppm_pixel color;
