@@ -118,7 +118,7 @@ void *find_image(void *userdata){
   float factor = 1.0/gamma;
   for(int i = start_R ; i < end_R; i++){
 	  for(int j = start_C ; j < end_C; j++){
-      int value = 0;
+      float value = 0;
 
       if(count[j*size + i] > 0){
         value = log(count[j*size + i]) / log(maxCount[id]);
