@@ -106,7 +106,9 @@ void *find_image(void *userdata){
           pthread_mutex_lock(&mutex);
           count[j*size + i] += 1;
           //update max count
-          if(count[j*size + i] > maxCount) maxCount = count[j*size + i];
+          if(count[j*size + i] > maxCount[id]){
+		  maxCount[id] = count[j*size + i];
+	  }
           pthread_mutex_unlock(&mutex);
 	      }
 	  }
@@ -121,7 +123,7 @@ void *find_image(void *userdata){
       int value = 0;
 
       if(count[j*size + i] > 0){
-        value = log(count[j*size + i]) / log(maxCount);
+        value = log(count[j*size + i]) / log(*maxCount);
         value = pow(value, factor);
       }
       struct ppm_pixel color;
@@ -181,8 +183,13 @@ int main(int argc, char* argv[]) {
   for(int i = 0 ; i< (size*size); i++){
     count[i] = 0;
   }
+  
+  int* maxCount;
+  maxCount = (int *) malloc(4 * sizeof(int));
 
-  int* maxCount = 0;
+  for(int i = 0; i < 4; i ++){
+    maxCount[i] = 0;
+  } 
   // generate pallet
   struct ppm_pixel* palette_colors;
   palette_colors = (struct ppm_pixel*) malloc(maxIterations * sizeof(struct ppm_pixel));
