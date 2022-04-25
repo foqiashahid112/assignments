@@ -26,7 +26,7 @@ struct thread_data{
 	int end_C;
   bool* escapes;
   int* count;
-  int maxCount;
+  int* maxCount;
 };
 
 pthread_mutex_t mutex;
@@ -49,7 +49,7 @@ void *find_image(void *userdata){
 	int end_R = data->end_R;
 	int start_C = data->start_C;
 	int end_C = data->end_C;
-  int maxCount = data->maxCount;
+  int* maxCount = data->maxCount;
 
 
 	//pthread_mutex_lock(&mutex);
@@ -182,7 +182,7 @@ int main(int argc, char* argv[]) {
     count[i] = 0;
   }
 
-  int maxCount = 0;
+  int* maxCount = 0;
   // generate pallet
   struct ppm_pixel* palette_colors;
   palette_colors = (struct ppm_pixel*) malloc(maxIterations * sizeof(struct ppm_pixel));
