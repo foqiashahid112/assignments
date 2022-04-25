@@ -27,42 +27,58 @@ pthread_mutex_t mutex;
 
 void *find_image(void *userdata){
 	struct thread_data *data = (struct thread_data *) userdata;
-	//pthread_mutex_lock(&mutex);
+  int id = data->id;
+	int size = data->size;
+  struct ppm_pixel* array_pixels = data->array_pixels;
+  struct ppm_pixel* palette_colors = data->palette_colors;
+  float xmin = data->xmin;
+	float xmax = data->xmax;
+	float ymin = data->ymin;
+	float ymax = data->ymax;
+	int maxIterations = data->maxIterations;
+	int start_R = data->start_R;
+	int end_R = data->end_R;
+	int start_C = data->start_C;
+	int end_C = data->end_C;
+
+
+	pthread_mutex_lock(&mutex);
 	printf("Thread %d) sub-image block: cols (%d, %d) to rows (%d,%d)\n", data->id, data->start_R, data->end_R, data->start_C,data->end_C);
-	 for(int i = data->start_R ; i < data->end_R; i++){
-	    for(int j = data->start_C ; j < data->end_C; j++){
-	      float xfrac = (float) i / (float) data->size;
-	      float yfrac = (float) j / (float) data->size;
-	      float x_0 = data->xmin + xfrac * (data->xmax - data->xmin);
-	      float y_0 = data->ymin + yfrac * (data->ymax - data->ymin);
+	 for(int i = start_R ; i < end_R; i++){
+	    for(int j = start_C ; j < end_C; j++){
+	      float xfrac = (float) i / (float) size;
+	      float yfrac = (float) j / (float) size;
+	      float x_0 = xmin + xfrac * (xmax - xmin);
+	      float y_0 = ymin + yfrac * (ymax - ymin);
 
 	      float x = 0;
 	      float y = 0;
 	      int iter = 0;
-	      while(iter < data->maxIterations && x*x + y*y < 2*2){
+	      while(iter < maxIterations && x*x + y*y < 2*2){
           float xtmp = x*x - y*y + x_0;
           y = 2*x*y + y_0;
           x = xtmp;
           iter++;
 	      }
 	      struct ppm_pixel color;
-	      if(iter < data->maxIterations){
-          color.red = data->palette_colors[iter].red;
-          color.blue = data->palette_colors[iter].blue;
-          color.green = data->palette_colors[iter].green;
+	      if(iter < maxIterations){
+          color.red = palette_colors[iter].red;
+          color.blue = palette_colors[iter].blue;
+          color.green = palette_colors[iter].green;
 	      }else{
           color.red = 0;
           color.blue = 0;
           color.green = 0;
 	      }
 	      //write color to image at location (row, col)
-	      pthread_mutex_lock(&mutex);
-	      data->array_pixels[j*data->size + i] = color;
-	      pthread_mutex_unlock(&mutex);
+	      //pthread_mutex_lock(&mutex);
+	      data->array_pixels[j*size + i] = color;
+	      //pthread_mutex_unlock(&mutex);
 	    }
-	 }
-	printf("Thread %d) finished\n",data->id);	
-	//pthread_mutex_unlock(&mutex);
+	  
+    }
+	printf("Thread %d) finished\n",id);	
+	pthread_mutex_unlock(&mutex);
 	return NULL;
 }
 
@@ -119,7 +135,7 @@ int main(int argc, char* argv[]) {
   for(int i = 0; i < 4; i++){
     printf("This is loop number %d\n", i);
     data[i].id = i;
-    data[i].size = subsize;
+    data[i].size = size;
     data[i].xmin = xmin;
     data[i].xmax = xmax;
     data[i].ymin = ymin;
@@ -151,20 +167,24 @@ int main(int argc, char* argv[]) {
     pthread_create(&threads[i], NULL, find_image, (void*) &data[i]);
   }
   
-  pthread_mutex_destroy(&mutex); 
-  gettimeofday(&tend, NULL);
-  timer = tend.tv_sec - tstart.tv_sec + (tend.tv_usec - tstart.tv_usec)/1.e6;
-
-  char outputFile[1000];
-  sprintf(outputFile, "mandelbrot-%d-%ld.ppm", size,time(0));
-  write_ppm(outputFile, array_pixels, size, size);
-  
-  printf("Computed mandelbrot set (%dx%d) in %g\n", size, size, timer);
-  printf("Writing file: %s\n", outputFile);
-
   for (int i = 0; i < 4; i++) {
     pthread_join(threads[i], NULL);
   }
+
+
+  char outputFile[1000];
+  sprintf(outputFile, "mandelbrot-%d-%ld.ppm", size,time(0));
+
+
+  pthread_mutex_destroy(&mutex); 
+  write_ppm(outputFile, array_pixels, size, size);
+  
+  gettimeofday(&tend, NULL);
+  timer = tend.tv_sec - tstart.tv_sec + (tend.tv_usec - tstart.tv_usec)/1.e6;
+
+  printf("Computed mandelbrot set (%dx%d) in %g\n", size, size, timer);
+  printf("Writing file: %s\n", outputFile);
+
 
   free(palette_colors);
   palette_colors = NULL;
