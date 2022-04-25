@@ -26,6 +26,7 @@ struct thread_data{
 pthread_mutex_t mutex;
 
 void *find_image(void *userdata){
+  pthread_mutex_lock(&mutex);
 	struct thread_data *data = (struct thread_data *) userdata;
   int id = data->id;
 	int size = data->size;
@@ -42,7 +43,6 @@ void *find_image(void *userdata){
 	int end_C = data->end_C;
 
 
-	pthread_mutex_lock(&mutex);
 	printf("Thread %d) sub-image block: cols (%d, %d) to rows (%d,%d)\n", data->id, data->start_R, data->end_R, data->start_C,data->end_C);
 	 for(int i = start_R ; i < end_R; i++){
 	    for(int j = start_C ; j < end_C; j++){
@@ -72,13 +72,13 @@ void *find_image(void *userdata){
 	      }
 	      //write color to image at location (row, col)
 	      //pthread_mutex_lock(&mutex);
-	      data->array_pixels[j*size + i] = color;
+	      array_pixels[j*size + i] = color;
 	      //pthread_mutex_unlock(&mutex);
 	    }
 	  
     }
+    pthread_mutex_unlock(&mutex);
 	printf("Thread %d) finished\n",id);	
-	pthread_mutex_unlock(&mutex);
 	return NULL;
 }
 
