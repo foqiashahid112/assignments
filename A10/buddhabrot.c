@@ -24,9 +24,9 @@ struct thread_data{
 	int end_R;
 	int start_C;
 	int end_C;
-  bool* escapes;
-  int* count;
-  int* maxCount;
+	bool* escapes;
+	int* count;
+	int* maxCount;
 };
 
 pthread_mutex_t mutex;
@@ -34,13 +34,13 @@ static pthread_barrier_t barrier;
 
 void *find_image(void *userdata){
 	struct thread_data *data = (struct thread_data *) userdata;
-  int id = data->id;
+	int id = data->id;
 	int size = data->size;
-  struct ppm_pixel* array_pixels = data->array_pixels;
-  struct ppm_pixel* palette_colors = data->palette_colors;
-  int* count = data->count;
-  bool* escapes = data->escapes;
-  float xmin = data->xmin;
+	struct ppm_pixel* array_pixels = data->array_pixels;
+	struct ppm_pixel* palette_colors = data->palette_colors;
+	int* count = data->count;
+	bool* escapes = data->escapes;
+	float xmin = data->xmin;
 	float xmax = data->xmax;
 	float ymin = data->ymin;
 	float ymax = data->ymax;
@@ -49,10 +49,9 @@ void *find_image(void *userdata){
 	int end_R = data->end_R;
 	int start_C = data->start_C;
 	int end_C = data->end_C;
-  int* maxCount = data->maxCount;
+	int* maxCount = data->maxCount;
 
 
-	//pthread_mutex_lock(&mutex);
 	printf("Thread %d) sub-image block: cols (%d, %d) to rows (%d,%d)\n", data->id, data->start_R, data->end_R, data->start_C,data->end_C);
 	 //Step 1:
    for(int i = start_R ; i < end_R; i++){
@@ -92,8 +91,7 @@ void *find_image(void *userdata){
 
 	      float x = 0;
 	      float y = 0;
-	      int iter = 0;
-	      while(iter < maxIterations && x*x + y*y < 2*2){
+	      while(x*x + y*y < 2*2){
           float xtmp = x*x - y*y + x_0;
           y = 2*x*y + y_0;
           x = xtmp;
