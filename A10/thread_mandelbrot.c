@@ -71,9 +71,7 @@ void *find_image(void *userdata){
           color.green = 0;
 	      }
 	      //write color to image at location (row, col)
-	      //pthread_mutex_lock(&mutex);
 	      array_pixels[j*size + i] = color;
-	      //pthread_mutex_unlock(&mutex);
 	    }
 	  
     }
@@ -123,7 +121,6 @@ int main(int argc, char* argv[]) {
     palette_colors[i].green = rand() % 255;
     palette_colors[i].blue = rand() % 255;
   }
-  printf("Palette initialized\n");
   
   struct ppm_pixel* array_pixels; 
   array_pixels = (struct ppm_pixel*) malloc(size*size* sizeof(struct ppm_pixel));
@@ -133,7 +130,6 @@ int main(int argc, char* argv[]) {
   struct thread_data data[4];
   int subsize = size / 4;
   for(int i = 0; i < 4; i++){
-    printf("This is loop number %d\n", i);
     data[i].id = i;
     data[i].size = size;
     data[i].xmin = xmin;

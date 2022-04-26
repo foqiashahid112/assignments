@@ -13,7 +13,6 @@
 struct thread_data{
 	int id;
 	int size;
-	struct ppm_pixel* palette_colors;
 	struct ppm_pixel* array_pixels;
 	float xmin;
 	float xmax;
@@ -39,7 +38,6 @@ void *find_image(void *userdata){
 	int id = data->id;
 	int size = data->size;
 	struct ppm_pixel* array_pixels = data->array_pixels;
-	struct ppm_pixel* palette_colors = data->palette_colors;
 	int* count = data->count;
 	bool* escapes = data->escapes;
 	float xmin = data->xmin;
@@ -160,7 +158,7 @@ int main(int argc, char* argv[]) {
     }
   }
 
-  printf("Generating mandelbrot with size %dx%d\n", size, size);
+  printf("Generating buddhabrot with size %dx%d\n", size, size);
   printf("  Num processes = %d\n", numProcesses);
   printf("  X range = [%.4f,%.4f]\n", xmin, xmax);
   printf("  Y range = [%.4f,%.4f]\n", ymin, ymax);
@@ -180,16 +178,6 @@ int main(int argc, char* argv[]) {
     count[i] = 0;
   }
   
-  struct ppm_pixel* palette_colors;
-  palette_colors = (struct ppm_pixel*) malloc(maxIterations * sizeof(struct ppm_pixel));
-
-  for(int i = 0; i < maxIterations; i++){
-    palette_colors[i].red = rand() % 255;
-    palette_colors[i].green = rand() % 255;
-    palette_colors[i].blue = rand() % 255;
-  }
-  printf("Palette initialized\n");
-  
   struct ppm_pixel* array_pixels; 
   array_pixels = (struct ppm_pixel*) malloc(size*size* sizeof(struct ppm_pixel));
   gettimeofday(&tstart, NULL);  
@@ -202,7 +190,6 @@ int main(int argc, char* argv[]) {
   pthread_barrier_init(&barrier, NULL, 4);
 
   for(int i = 0; i < 4; i++){
-    printf("This is loop number %d\n", i);
     data[i].escapes = escapes;
     data[i].count = count;
     data[i].id = i;
@@ -233,7 +220,6 @@ int main(int argc, char* argv[]) {
       data[i].start_C = size/2;
       data[i].end_C = size;
     }
-    data[i].palette_colors = palette_colors;
     data[i].array_pixels = array_pixels;
     data[i].count = count;
     pthread_create(&threads[i], NULL, find_image, (void*) &data[i]);
@@ -255,12 +241,13 @@ int main(int argc, char* argv[]) {
   gettimeofday(&tend, NULL);
   timer = tend.tv_sec - tstart.tv_sec + (tend.tv_usec - tstart.tv_usec)/1.e6;
 
-  printf("Computed mandelbrot set (%dx%d) in %g\n", size, size, timer);
+  printf("Computed buddhabrot set (%dx%d) in %g\n", size, size, timer);
   printf("Writing file: %s\n", outputFile);
 
-
-  free(palette_colors);
-  palette_colors = NULL;
+  free(escapes);
+  escapes = NULL;
+  free(count);
+  count = NULL;
   free(array_pixels);
   array_pixels = NULL;
   
