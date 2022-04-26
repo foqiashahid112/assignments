@@ -105,9 +105,9 @@ void *find_image(void *userdata){
 
         //int local_maxCount = 0;
         pthread_mutex_lock(&mutex);
-        count[j*size + i] = count[j*size + i] + 1;
-        if(count[j*size + i] > maxCount){
-		      maxCount = count[j*size + i];
+        count[yrow*size + xcol]++;
+        if(count[yrow*size + xcol] > maxCount){
+		      maxCount = count[yrow*size + xcol];
 	      }
         pthread_mutex_unlock(&mutex);
 	    }
