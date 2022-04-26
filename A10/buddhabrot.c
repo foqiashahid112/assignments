@@ -180,13 +180,6 @@ int main(int argc, char* argv[]) {
     count[i] = 0;
   }
   
-  int* maxCount;
-  maxCount = (int *) malloc(4 * sizeof(int));
-
-  for(int i = 0; i < 4; i ++){
-    maxCount[i] = 0;
-  } 
-
   struct ppm_pixel* palette_colors;
   palette_colors = (struct ppm_pixel*) malloc(maxIterations * sizeof(struct ppm_pixel));
 
