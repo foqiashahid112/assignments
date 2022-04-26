@@ -62,33 +62,33 @@ void *find_image(void *userdata){
 	      float y = 0;
 	      int iter = 0;
 	      while(iter < maxIterations && x*x + y*y < 2*2){
-          float xtmp = x*x - y*y + x_0;
-          y = 2*x*y + y_0;
-          x = xtmp;
-          iter++;
+		  float xtmp = x*x - y*y + x_0;
+		  y = 2*x*y + y_0;
+		  x = xtmp;
+		  iter++;
 	      }
 
 	      if(iter < maxIterations){
-          escapes[j*size + i] = false;
+		  escapes[j*size + i] = false;
 	      }else{
-          escapes[j*size + i] = true;
+		  escapes[j*size + i] = true;
 	      }
 	    }
     }
 
   //Step 2: Compute visited counts
-  long long local_maxCount = 0;
   for(int i = start_R ; i < end_R; i++){
     for(int j = start_C ; j < end_C; j++){
       //if (row,col) belongs to the mandelbrot set, continue
-      if(escapes[j* size + i] == true) continue;
-	    float xfrac = (float) i / (float) size;
-	    float yfrac = (float) j / (float) size;
-	    float x_0 = xmin + xfrac * (xmax - xmin);
-	    float y_0 = ymin + yfrac * (ymax - ymin);
+      if(escapes[j* size + i] == true) {continue;}
+      else{
+      float xfrac = (float) i / (float) size;
+      float yfrac = (float) j / (float) size;
+      float x_0 = xmin + xfrac * (xmax - xmin);
+      float y_0 = ymin + yfrac * (ymax - ymin);
 
-	    float x = 0;
-	    float y = 0;
+      float x = 0;
+      float y = 0;
       while(x*x + y*y < 2*2){
         float xtmp = x*x - y*y + x_0;
         y = 2*x*y + y_0;
@@ -105,7 +105,7 @@ void *find_image(void *userdata){
         }
         pthread_mutex_unlock(&mutex);
       }
-
+    }
     }
   }
 
