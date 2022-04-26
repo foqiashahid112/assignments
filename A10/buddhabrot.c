@@ -13,6 +13,7 @@
 struct thread_data{
 	int id;
 	int size;
+	struct ppm_pixel* palette_colors;
 	struct ppm_pixel* array_pixels;
 	float xmin;
 	float xmax;
@@ -25,6 +26,7 @@ struct thread_data{
 	int end_C;
 	bool* escapes;
 	int* count;
+	int* maxCount;
 };
 
 static unsigned long long maxCount = 0;
@@ -37,6 +39,7 @@ void *find_image(void *userdata){
 	int id = data->id;
 	int size = data->size;
 	struct ppm_pixel* array_pixels = data->array_pixels;
+	struct ppm_pixel* palette_colors = data->palette_colors;
 	int* count = data->count;
 	bool* escapes = data->escapes;
 	float xmin = data->xmin;
@@ -48,6 +51,8 @@ void *find_image(void *userdata){
 	int end_R = data->end_R;
 	int start_C = data->start_C;
 	int end_C = data->end_C;
+	//int* maxCount = data->maxCount;
+
 
 	printf("Thread %d) sub-image block: cols (%d, %d) to rows (%d,%d)\n", data->id, data->start_R, data->end_R, data->start_C,data->end_C);
 	 //Step 1:
@@ -62,34 +67,34 @@ void *find_image(void *userdata){
 	      float y = 0;
 	      int iter = 0;
 	      while(iter < maxIterations && x*x + y*y < 2*2){
-		  float xtmp = x*x - y*y + x_0;
-		  y = 2*x*y + y_0;
-		  x = xtmp;
-		  iter++;
+          float xtmp = x*x - y*y + x_0;
+          y = 2*x*y + y_0;
+          x = xtmp;
+          iter++;
 	      }
 
 	      if(iter < maxIterations){
-		  escapes[j*size + i] = false;
+          escapes[j*size + i] = false;
 	      }else{
-		  escapes[j*size + i] = true;
+          escapes[j*size + i] = true;
 	      }
 	    }
     }
 
   //Step 2: Compute visited counts
+  
   for(int i = start_R ; i < end_R; i++){
-    for(int j = start_C ; j < end_C; j++){
+	  for(int j = start_C ; j < end_C; j++){
       //if (row,col) belongs to the mandelbrot set, continue
-      if(escapes[j* size + i] == true) {continue;}
-      else{
-      float xfrac = (float) i / (float) size;
-      float yfrac = (float) j / (float) size;
-      float x_0 = xmin + xfrac * (xmax - xmin);
-      float y_0 = ymin + yfrac * (ymax - ymin);
+      if(escapes[j* size + i] == true) continue;
+	    float xfrac = (float) i / (float) size;
+	    float yfrac = (float) j / (float) size;
+	    float x_0 = xmin + xfrac * (xmax - xmin);
+	    float y_0 = ymin + yfrac * (ymax - ymin);
 
-      float x = 0;
-      float y = 0;
-      while(x*x + y*y < 2*2){
+	    float x = 0;
+	    float y = 0;
+	    while(x*x + y*y < 2*2){
         float xtmp = x*x - y*y + x_0;
         y = 2*x*y + y_0;
         x = xtmp;
@@ -98,15 +103,15 @@ void *find_image(void *userdata){
         if (yrow < 0 || yrow >= size) continue; // out of range
         if (xcol < 0 || xcol >= size) continue; // out of range
 
+        //int local_maxCount = 0;
         pthread_mutex_lock(&mutex);
-        count[j*size + i] += 1;
+        count[j*size + i] = count[j*size + i] + 1;
         if(count[j*size + i] > maxCount){
-	     maxCount = count[j*size + i];
-        }
+		      maxCount = count[j*size + i];
+	      }
         pthread_mutex_unlock(&mutex);
-      }
-    }
-    }
+	    }
+	  }
   }
 
   pthread_barrier_wait(&barrier);
@@ -114,7 +119,7 @@ void *find_image(void *userdata){
   float gamma = 0.681;
   float factor = 1.0/gamma;
   for(int i = start_R ; i < end_R; i++){
-    for(int j = start_C ; j < end_C; j++){
+	  for(int j = start_C ; j < end_C; j++){
       float value = 0;
 
       if(count[j*size + i] > 0){
@@ -126,9 +131,9 @@ void *find_image(void *userdata){
       color.green = value * 255;
       color.blue = value * 255;
       array_pixels[j*size + i] = color;
-    }
+	  }
   }
-  printf("Thread %d) finished\n",id);	
+	printf("Thread %d) finished\n",id);	
   return NULL;
 }
 
@@ -175,13 +180,30 @@ int main(int argc, char* argv[]) {
     count[i] = 0;
   }
   
+  int* maxCount;
+  maxCount = (int *) malloc(4 * sizeof(int));
+
+  for(int i = 0; i < 4; i ++){
+    maxCount[i] = 0;
+  } 
+
+  struct ppm_pixel* palette_colors;
+  palette_colors = (struct ppm_pixel*) malloc(maxIterations * sizeof(struct ppm_pixel));
+
+  for(int i = 0; i < maxIterations; i++){
+    palette_colors[i].red = rand() % 255;
+    palette_colors[i].green = rand() % 255;
+    palette_colors[i].blue = rand() % 255;
+  }
+  printf("Palette initialized\n");
+  
   struct ppm_pixel* array_pixels; 
   array_pixels = (struct ppm_pixel*) malloc(size*size* sizeof(struct ppm_pixel));
-  
   gettimeofday(&tstart, NULL);  
   // compute image using 4 threads
   pthread_t threads[4];
   struct thread_data data[4];
+  int subsize = size / 4;
 
   pthread_mutex_init(&mutex, NULL);
   pthread_barrier_init(&barrier, NULL, 4);
@@ -218,7 +240,9 @@ int main(int argc, char* argv[]) {
       data[i].start_C = size/2;
       data[i].end_C = size;
     }
+    data[i].palette_colors = palette_colors;
     data[i].array_pixels = array_pixels;
+    data[i].count = count;
     pthread_create(&threads[i], NULL, find_image, (void*) &data[i]);
   }
   
@@ -242,10 +266,8 @@ int main(int argc, char* argv[]) {
   printf("Writing file: %s\n", outputFile);
 
 
-  free(count);
-  free(escapes);
-  count = NULL;
-  escapes = NULL;
+  free(palette_colors);
+  palette_colors = NULL;
   free(array_pixels);
   array_pixels = NULL;
   
