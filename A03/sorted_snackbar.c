@@ -2,7 +2,7 @@
 // sorted_snackbar.c 
 // CS223 - Spring 2022
 // Ask the user for a list of snacks and store them in alphabetical order
-// Name:
+// Name : Foqia
 //
 #include <stdio.h>
 #include <stdlib.h>
@@ -26,40 +26,60 @@ struct snack {
 struct snack* insert_sorted(struct snack* snacks, 
   const char* name, int quantity, float cost) {
     
-  struct snack* newSnack = malloc(sizeof(struct snack));
-  if(newSnack == NULL){
-    printf("ERROR: Out of Space!\n");
-    exit(1);
-  }
-  strcpy(newSnack->name , name);
-  newSnack->quantity = quantity;
-  newSnack->cost = cost;
-  newSnack->next = NULL;
+  //struct snack* newSnack = malloc(sizeof(struct snack));
+  //if(newSnack == NULL){
+  //  printf("ERROR: Out of Space!\n");
+  //  exit(1);
+  //}
+  //strcpy(newSnack->name , name);
+  //newSnack->quantity = quantity;
+  //newSnack->cost = cost;
+  //newSnack->next = NULL;
   
   if(snacks == NULL){
-    return newSnack;
+    	struct snack* newSnack = malloc(sizeof(struct snack));
+	  if(newSnack == NULL){
+	    printf("ERROR: Out of Space!\n");
+	    exit(1);
+	  }
+	  strcpy(newSnack->name , name);
+	  newSnack->quantity = quantity;
+	  newSnack->cost = cost;
+	  newSnack->next = NULL;
+
+	return newSnack;
   }
-  //snacks is not empty
-  struct snack* head = snacks;
-  struct snack* temp = snacks;
-  struct snack* prevSnack = NULL;
-  while(temp != NULL){
-      if(strcmp(temp->name, newSnack->name) > 0){ //left(b) is greater than right(a)
-        //if temp is pointing to head
-        if(temp == head){
-        newSnack->next = temp;
-        head = newSnack;
-        }else{
-        //if temp is somewhere in the middle
-        newSnack->next = temp;
-        prevSnack->next = newSnack;
-        }
-        return head;  
-      }
-      prevSnack = temp;
-      temp = temp->next; 
+  else if(strcmp(name,snacks->name) < 0){
+	 struct snack* newSnack = malloc(sizeof(struct snack));
+	  if(newSnack == NULL){
+	    printf("ERROR: Out of Space!\n");
+	    exit(1);
+	  }
+	  strcpy(newSnack->name , name);
+	  newSnack->quantity = quantity;
+	  newSnack->cost = cost;
+ 
+	  newSnack->next = snacks;
+	snacks = newSnack;
+	return snacks;
   }
-  return head;
+  else{
+	struct snack* temp = snacks;
+  	while(temp->next != NULL){
+		if(strcmp(name, temp->next->name) < 0) break;
+		temp = temp->next;
+	}
+	struct snack* new = NULL;
+	new = (struct snack*)malloc(sizeof(struct snack));
+	strcpy(new-> name,name);
+	new->quantity = quantity;
+	new->cost = cost;
+	new->next = temp->next;
+	temp->next = new;
+	return snacks;
+  
+  }
+
 }
 
 // Delete (e.g. free) all nodes in the given list of snacks
@@ -102,7 +122,6 @@ int main() {
     if(snackbar == NULL) break;
   }
   clear(head);
-  
   return 0;
 }
 

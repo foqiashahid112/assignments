@@ -17,10 +17,13 @@ int main() {
     printf("Cannot allocate new string. Exciting...\n");
     exit(0);
   }
+  output[0] = 0;
+  //output = "";
   for(int i = 0; i < n; i++){
     strcat(output, s);
   }
   printf("Your word is %s\n", output);
   free(output);
+  output = NULL;
   return 0;
 }

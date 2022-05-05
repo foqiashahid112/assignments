@@ -16,7 +16,8 @@ struct ppm_pixel** read_ppm(const char* filename, int* w, int* h) {
   char buffer[1000];
   //magic number
   fgets(buffer, 1000, infile);
-  strcpy(buffer, magic_number);
+  //buffer[0] = 0;
+  strcpy(magic_number, buffer);
   //white space
   fgets(buffer, 1000, infile);
   if(buffer[0] == '#'){
