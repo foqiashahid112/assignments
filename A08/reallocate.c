@@ -11,9 +11,8 @@ int main (int argc, char* argv[]) {
   void *current;
 
   printf("The intial top of the heap is %p. \n", init);
-
   for(int i = 0; i < LOOPS; i++){
-  	int *memory;
+  	int* memory;
 	memory = malloc(size);
 	if( memory == NULL){
 		fprintf(stderr, "malloc failed\n");
@@ -24,7 +23,7 @@ int main (int argc, char* argv[]) {
   }
   current = sbrk(0);
   printf("The current top of the heap is %p. \n", current);
-  int allocated = (int) (current - init);
+  unsigned int allocated = (int) (current - init);
   printf("Increased by %d (0x%x) bytes\n", allocated, allocated);
   return 0 ;
 }
