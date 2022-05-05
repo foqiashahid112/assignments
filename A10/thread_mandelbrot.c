@@ -23,10 +23,8 @@ struct thread_data{
 	int end_C;
 };
 
-pthread_mutex_t mutex;
 
 void *find_image(void *userdata){
-  pthread_mutex_lock(&mutex);
 	struct thread_data *data = (struct thread_data *) userdata;
   int id = data->id;
 	int size = data->size;
@@ -75,7 +73,6 @@ void *find_image(void *userdata){
 	    }
 	  
     }
-    pthread_mutex_unlock(&mutex);
 	printf("Thread %d) finished\n",id);	
 	return NULL;
 }
@@ -171,8 +168,6 @@ int main(int argc, char* argv[]) {
   char outputFile[1000];
   sprintf(outputFile, "mandelbrot-%d-%ld.ppm", size,time(0));
 
-
-  pthread_mutex_destroy(&mutex); 
   write_ppm(outputFile, array_pixels, size, size);
   
   gettimeofday(&tend, NULL);
