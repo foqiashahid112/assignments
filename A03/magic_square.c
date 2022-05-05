@@ -61,8 +61,16 @@ int main() {
   scanf("%d %d", &r, &c);
 
   int** matrix = malloc(sizeof(int*) * r);
+  if (matrix == NULL){   
+        printf("Cannot allocate new memory. Exiting...\n");
+        exit(0);
+  }
   for(int i = 0; i < r; i++){
     matrix[i] = malloc(sizeof(int) * c);
+    if(matrix[i] == NULL){
+    	printf("Cannot allocate new memory. Exciting...\n");
+	exit(0);
+    }
   }
   
   for(int i = 0; i < r; i++){

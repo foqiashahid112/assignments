@@ -2,7 +2,7 @@
 // sorted_snackbar.c 
 // CS223 - Spring 2022
 // Ask the user for a list of snacks and store them in alphabetical order
-// Name:
+// Name : Foqia
 //
 #include <stdio.h>
 #include <stdlib.h>
@@ -39,27 +39,32 @@ struct snack* insert_sorted(struct snack* snacks,
   if(snacks == NULL){
     return newSnack;
   }
-  //snacks is not empty
-  struct snack* head = snacks;
-  struct snack* temp = snacks;
-  struct snack* prevSnack = NULL;
-  while(temp != NULL){
-      if(strcmp(temp->name, newSnack->name) > 0){ //left(b) is greater than right(a)
-        //if temp is pointing to head
-        if(temp == head){
-        newSnack->next = temp;
-        head = newSnack;
-        }else{
-        //if temp is somewhere in the middle
-        newSnack->next = temp;
-        prevSnack->next = newSnack;
-        }
-        return head;  
-      }
-      prevSnack = temp;
-      temp = temp->next; 
+  else if(strcmp(name,snacks->name) < 0){
+  	newSnack->next = snacks;
+	snacks = newSnack;
+	free(newSnack);
+	newSnack = NULL;
+	return snacks;
   }
-  return head;
+  else{
+	struct snack* temp = snacks;
+  	while(temp->next != NULL){
+		if(strcmp(name, temp->next->name) < 0) break;
+		temp = temp->next;
+	}
+	struct snack* new = NULL;
+	new = (struct snack*)malloc(sizeof(struct snack));
+	strcpy(new-> name,name);
+	new->quantity = quantity;
+	new->cost = cost;
+	new->next = temp->next;
+	temp->next = new;
+	free(newSnack);
+	newSnack = NULL;
+	return snacks;
+  
+  }
+
 }
 
 // Delete (e.g. free) all nodes in the given list of snacks
@@ -102,7 +107,6 @@ int main() {
     if(snackbar == NULL) break;
   }
   clear(head);
-  
   return 0;
 }
 
