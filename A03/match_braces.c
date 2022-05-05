@@ -118,6 +118,7 @@ int main(int argc, char* argv[]) {
     } 
     c+=1;
   }
+  fclose(infile);
   while(stack != NULL){
     printf("Unmatched brace on Line %d and Column %d \n", stack->linenum, stack->colnum);
     stack = pop(stack);

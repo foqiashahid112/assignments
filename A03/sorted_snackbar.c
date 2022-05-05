@@ -26,24 +26,41 @@ struct snack {
 struct snack* insert_sorted(struct snack* snacks, 
   const char* name, int quantity, float cost) {
     
-  struct snack* newSnack = malloc(sizeof(struct snack));
-  if(newSnack == NULL){
-    printf("ERROR: Out of Space!\n");
-    exit(1);
-  }
-  strcpy(newSnack->name , name);
-  newSnack->quantity = quantity;
-  newSnack->cost = cost;
-  newSnack->next = NULL;
+  //struct snack* newSnack = malloc(sizeof(struct snack));
+  //if(newSnack == NULL){
+  //  printf("ERROR: Out of Space!\n");
+  //  exit(1);
+  //}
+  //strcpy(newSnack->name , name);
+  //newSnack->quantity = quantity;
+  //newSnack->cost = cost;
+  //newSnack->next = NULL;
   
   if(snacks == NULL){
-    return newSnack;
+    	struct snack* newSnack = malloc(sizeof(struct snack));
+	  if(newSnack == NULL){
+	    printf("ERROR: Out of Space!\n");
+	    exit(1);
+	  }
+	  strcpy(newSnack->name , name);
+	  newSnack->quantity = quantity;
+	  newSnack->cost = cost;
+	  newSnack->next = NULL;
+
+	return newSnack;
   }
   else if(strcmp(name,snacks->name) < 0){
-  	newSnack->next = snacks;
+	 struct snack* newSnack = malloc(sizeof(struct snack));
+	  if(newSnack == NULL){
+	    printf("ERROR: Out of Space!\n");
+	    exit(1);
+	  }
+	  strcpy(newSnack->name , name);
+	  newSnack->quantity = quantity;
+	  newSnack->cost = cost;
+ 
+	  newSnack->next = snacks;
 	snacks = newSnack;
-	free(newSnack);
-	newSnack = NULL;
 	return snacks;
   }
   else{
@@ -59,8 +76,6 @@ struct snack* insert_sorted(struct snack* snacks,
 	new->cost = cost;
 	new->next = temp->next;
 	temp->next = new;
-	free(newSnack);
-	newSnack = NULL;
 	return snacks;
   
   }
