@@ -36,6 +36,8 @@ void *malloc (size_t size) {
   } else {
     struct chunk* cnk = (struct chunk*) memory;
     cnk->size = size;
+    cnk->inUse = size;
+    cnk->next = 0; 
     return (void*) (cnk + 1);
   }
 }
